@@ -32,4 +32,12 @@ public class WeatherForecastController : ControllerBase
             })
             .ToArray();
     }
+
+    [HttpGet("name")]
+    public async Task<IActionResult> GetName()
+    {
+        var name = _configuration["MyApp:Settings:Name"];
+
+        return Ok(name);
+    }
 }

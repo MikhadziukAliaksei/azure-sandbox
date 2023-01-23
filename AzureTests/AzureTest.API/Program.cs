@@ -9,13 +9,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Configuration.AddAzureAppConfiguration("Endpoint=https://azure-test-appconfig.azconfig.io;Id=0ovR-l9-s0:4BLwpXdIiK8GPQ41n6mG;Secret=MepBHD4pf/jHVnalt4EFNCv+3yP1cPr11+pvFBH62zw=");
-// builder.Configuration.AddAzureAppConfiguration(options =>
-// {
-//     options.Connect(
-//             "Endpoint=https://azure-test-appconfig.azconfig.io;Id=0ovR-l9-s0:4BLwpXdIiK8GPQ41n6mG;Secret=MepBHD4pf/jHVnalt4EFNCv+3yP1cPr11+pvFBH62zw=")
-//         .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); });
-// });
+builder.Services.AddAzureAppConfiguration();
+builder.Configuration.AddAzureAppConfiguration(options =>
+{
+    options.Connect(
+            "Endpoint=https://my-app-config-test.azconfig.io;Id=+BWw-l9-s0:TxDnTC1wxlVzSAq1XoMi;Secret=r0aDBtDd/7R6W+gLXWsmwRRMqikLyh/N7AppaltM2bA=")
+        .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
+        .ConfigureRefresh(refresh =>
+        {
+            refresh.Register("MyApp:Settings:Sentinel", refreshAll: true)
+                .SetCacheExpiration(TimeSpan.FromSeconds(3));
+        });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +30,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAzureAppConfiguration();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
