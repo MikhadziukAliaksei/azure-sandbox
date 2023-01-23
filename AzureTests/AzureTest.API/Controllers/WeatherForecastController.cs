@@ -7,6 +7,7 @@ namespace AzureTest.API.Controllers;
 public class WeatherForecastController : ControllerBase
 {
     private readonly IConfiguration _configuration;
+    private readonly TestConfig _testConfig;
 
     private static readonly string[] Summaries = new[]
     {
@@ -15,10 +16,11 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration, TestConfig testConfig)
     {
         _logger = logger;
         _configuration = configuration;
+        _testConfig = testConfig;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -38,6 +40,8 @@ public class WeatherForecastController : ControllerBase
     {
         var name = _configuration["MyApp:Settings:Name"];
 
-        return Ok(name);
+        var t = _testConfig.Name;
+        
+        return Ok(t);
     }
 }

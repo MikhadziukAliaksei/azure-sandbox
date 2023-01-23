@@ -1,4 +1,5 @@
 using Azure.Identity;
+using AzureTest.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +15,21 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 {
     options.Connect(
             "Endpoint=https://my-app-config-test.azconfig.io;Id=+BWw-l9-s0:TxDnTC1wxlVzSAq1XoMi;Secret=r0aDBtDd/7R6W+gLXWsmwRRMqikLyh/N7AppaltM2bA=")
-        .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
+        .ConfigureKeyVault(kv =>
+        {
+            kv.SetCredential(new DefaultAzureCredential()); 
+            kv.SetSecretRefreshInterval("MyApp:Settings:Sentinel",TimeSpan.FromSeconds(2));
+        })
         .ConfigureRefresh(refresh =>
         {
             refresh.Register("MyApp:Settings:Sentinel", refreshAll: true)
                 .SetCacheExpiration(TimeSpan.FromSeconds(3));
+            
         });
 });
+
+builder.Services.AddSingleton(builder.Configuration.GetTestConfig());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
